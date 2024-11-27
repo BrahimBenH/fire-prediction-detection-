@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fire Prediction Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="header">
+        <h1>FlameTrace Dashboard</h1>
+    </header>
+    <nav class="navbar">
+        <ul>
+            <li><a href="#overview">Overview</a></li>
+            <li><a href="#updates">Real-Time Updates</a></li>
+            <li><a href="#visualization">Data Visualization</a></li>
+            <li><a href="#settings">Settings</a></li>
+        </ul>
+    </nav>
+    <main>
+        <section id="overview" class="card">
+            <h2>Overview</h2>
+            <p>Detect, validate, and forecast fire propagation with real-time insights.</p>
+        </section>
+        <section id="updates" class="card">
+            <h2>Real-Time Updates</h2>
+            <div class="updates">
+                <p>No active fire alerts.</p>
+            </div>
+        </section>
+        <section id="visualization" class="card">
+            <h2>Data Visualization</h2>
+            <div class="chart-container">
+                <p>Chart area (e.g., fire heatmaps, graphs).</p>
+            </div>
+        </section>
+        <section id="settings" class="card">
+            <h2>Settings</h2>
+            <form>
+                <label for="region">Select Region:</label>
+                <select id="region" name="region">
+                    <option value="global">Global</option>
+                    <option value="local">Local</option>
+                </select>
+                <button type="submit">Update</button>
+            </form>
+        </section>
+    </main>
+    <footer class="footer">
+        <p>© 2024 FlameTrace. All rights reserved.</p>
+    </footer>
+</body>
+</html>
