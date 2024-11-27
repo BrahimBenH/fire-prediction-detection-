@@ -3,52 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fire Prediction Dashboard</title>
+    <title>Prediction</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
 </head>
 <body>
     <header class="header">
-        <h1>FlameTrace Dashboard</h1>
+        <h1>Fire Prediction</h1>
+        <p>View predicted fire locations and their risk levels.</p>
     </header>
     <nav class="navbar">
         <ul>
-            <li><a href="#overview">Overview</a></li>
-            <li><a href="#updates">Real-Time Updates</a></li>
-            <li><a href="#visualization">Data Visualization</a></li>
-            <li><a href="#settings">Settings</a></li>
+            <li><a href="prediction.html">Prediction</a></li>
+            <li><a href="detection.html">Detection</a></li>
+            <li><a href="report.html">Reports</a></li>
         </ul>
     </nav>
-    <main>
-        <section id="overview" class="card">
-            <h2>Overview</h2>
-            <p>Detect, validate, and forecast fire propagation with real-time insights.</p>
-        </section>
-        <section id="updates" class="card">
-            <h2>Real-Time Updates</h2>
-            <div class="updates">
-                <p>No active fire alerts.</p>
+    <main class="main-content">
+        <section id="predictions-section" class="card">
+            <h2>Predicted Fire Locations</h2>
+            <div id="cards-container" class="cards-container">
+                <!-- Cards will be generated here by JavaScript -->
             </div>
         </section>
-        <section id="visualization" class="card">
-            <h2>Data Visualization</h2>
-            <div class="chart-container">
-                <p>Chart area (e.g., fire heatmaps, graphs).</p>
-            </div>
-        </section>
-        <section id="settings" class="card">
-            <h2>Settings</h2>
-            <form>
-                <label for="region">Select Region:</label>
-                <select id="region" name="region">
-                    <option value="global">Global</option>
-                    <option value="local">Local</option>
-                </select>
-                <button type="submit">Update</button>
-            </form>
+        <section id="map-section" class="card">
+            <h2>Risk Map</h2>
+            <div id="map"></div>
         </section>
     </main>
+    
     <footer class="footer">
-        <p>© 2024 FlameTrace. All rights reserved.</p>
+        <p>© 2024 Fire Prediction App. Powered by AI.</p>
     </footer>
+    
+    <script>
+        // Initialize Leaflet map
+        var map = L.map('map').setView([34.0522, -118.2437], 6); // Initial coordinates (Los Angeles)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19
+        }).addTo(map);
+
+        // Example predicted locations with lat, lng, and risk level
+        var predictedLocations = [
+            { lat: 34.0522, lng: -118.2437, name: "Los Angeles", risk: "High" },
+            { lat: 36.7783, lng: -119.4179, name: "California", risk: "Moderate" },
+            { lat: 37.7749, lng: -122.4194, name: "San Francisco", risk: "Low" }
+        ];
+
+        // Generate cards dynamically for each predicted location
+        var cardsContainer = document.getElementById('cards-container');
+        predictedLocations.forEach(function(location) {
+            var card = document.createElement('div');
+            card.classList.add('prediction-card');
+            card.innerHTML = `
+                <h3>${location.name}</h3>
+                <p>Risk Level: ${location.risk}</p>
+            `;
+            // Add event listener to zoom the map when the card is clicked
+            card.addEventListener('click', function() {
+                map.setView([location.lat, location.lng], 10); // Zoom in on the clicked location
+                L.marker([location.lat, location.lng])
+                    .addTo(map)
+                    .bindPopup(`${location.name}<br>Risk: ${location.risk}`)
+                    .openPopup();
+            });
+            cardsContainer.appendChild(card);
+        });
+
+        // Create initial markers on the map for the predicted locations
+        predictedLocations.forEach(function(location) {
+            L.marker([location.lat, location.lng])
+                .addTo(map)
+                .bindPopup(`${location.name}<br>Risk: ${location.risk}`);
+        });
+    </script>
+
+    <script>
+        // Get all the links in the navbar
+        const navLinks = document.querySelectorAll('.navbar a');
+
+        // Loop through each link
+        navLinks.forEach(link => {
+            // Check if the current URL matches the link's href
+            if (link.href === window.location.href) {
+                // Add the 'active' class to the matching link
+                link.classList.add('active');
+            }
+        });
+    </script>
 </body>
 </html>

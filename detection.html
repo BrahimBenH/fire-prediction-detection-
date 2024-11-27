@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detection</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+</head>
+<body>
+    <header class="header">
+        <h1>Fire Detection</h1>
+        <p>Visualize fire risks in real-time.</p>
+    </header>
+    <nav class="navbar">
+        <ul>
+            <li><a href="prediction.html">Prediction</a></li>
+            <li><a href="detection.html">Detection</a></li>
+            <li><a href="report.html">Reports</a></li>
+        </ul>
+    </nav>
+    <main class="main-content">
+        <section id="map-section" class="card">
+            <h2>Risk Map</h2>
+            <div id="map"></div>
+        </section>
+    </main>
+    
+    <footer class="footer">
+        <p>© 2024 Fire Prediction App. Powered by AI.</p>
+    </footer>
+    
+    <script>
+        // Initialize Leaflet map
+        var map = L.map('map').setView([34.0522, -118.2437], 6); // Example coordinates
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19
+        }).addTo(map);
+
+        // Example fire detection and drone locations
+        var locations = [
+            { lat: 34.0522, lng: -118.2437, status: "drone", name: "Los Angeles" }, // Drone heading
+            { lat: 36.7783, lng: -119.4179, status: "fire", name: "California" }, // Fire detected
+            { lat: 37.7749, lng: -122.4194, status: "no-fire", name: "San Francisco" } // No fire
+        ];
+
+        // Function to get the marker color based on the fire status
+        function getMarkerColor(status) {
+            switch (status) {
+                case "drone":
+                    return "blue";  // Drone heading location (Blue)
+                case "fire":
+                    return "red";   // Fire detected location (Red)
+                case "no-fire":
+                    return "green"; // No fire detected (Green)
+                default:
+                    return "gray";  // Default color if status is unknown
+            }
+        }
+
+        // Add markers for each location with color-based on status
+        locations.forEach(location => {
+            var markerColor = getMarkerColor(location.status);
+            L.circleMarker([location.lat, location.lng], {
+                color: markerColor,
+                radius: 10,
+                fillOpacity: 0.7
+            })
+            .addTo(map)
+            .bindPopup(`<strong>${location.name}</strong><br>Status: ${location.status === "drone" ? "Drone Heading" : location.status === "fire" ? "Fire Detected" : "No Fire Detected"}`)
+            .openPopup();
+        });
+    </script>
+
+    <script>
+        // Get all the links in the navbar
+        const navLinks = document.querySelectorAll('.navbar a');
+
+        // Loop through each link
+        navLinks.forEach(link => {
+            // Check if the current URL matches the link's href
+            if (link.href === window.location.href) {
+                // Add the 'active' class to the matching link
+                link.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

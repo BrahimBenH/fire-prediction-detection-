@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="header">
+        <h1>Propagation Report</h1>
+        <p>Analyze fire spread and forecasts.</p>
+    </header>
+    <nav class="navbar">
+        <ul>
+            <li><a href="prediction.html">Prediction</a></li>
+            <li><a href="detection.html">Detection</a></li>
+            <li><a href="report.html">Reports</a></li>
+        </ul>
+    </nav>
+    <main class="main-content">
+        <section id="report-section" class="card">
+            <h2>Propagation Report</h2>
+            <div class="report-content">
+                <p>Region A: Fire spread predicted at 5 km/hr towards the north.</p>
+                <p>Region B: Stable with no propagation risks.</p>
+            </div>
+        </section>
+    </main>
+    
+    <footer class="footer">
+        <p>© 2024 Fire Prediction App. Powered by AI.</p>
+    </footer>
+</body>
+<script>
+    // Get all the links in the navbar
+    const navLinks = document.querySelectorAll('.navbar a');
+
+    // Loop through each link
+    navLinks.forEach(link => {
+        // Check if the current URL matches the link's href
+        if (link.href === window.location.href) {
+            // Add the 'active' class to the matching link
+            link.classList.add('active');
+        }
+    });
+</script>
+
+</html>
+
