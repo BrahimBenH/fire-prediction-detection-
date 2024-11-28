@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <header class="header">
@@ -15,21 +16,39 @@
     </header>
     <nav class="navbar">
         <ul>
-            <li><a href="prediction.html">Prediction</a></li>
+            <li><a href="prediction.html" class="active">Prediction</a></li>
             <li><a href="detection.html">Detection</a></li>
             <li><a href="report.html">Reports</a></li>
         </ul>
     </nav>
     <main class="main-content">
+        <!-- Predicted Fire Locations -->
         <section id="predictions-section" class="card">
             <h2>Predicted Fire Locations</h2>
             <div id="cards-container" class="cards-container">
                 <!-- Cards will be generated here by JavaScript -->
             </div>
         </section>
+
+        <!-- Risk Map -->
         <section id="map-section" class="card">
             <h2>Risk Map</h2>
             <div id="map"></div>
+        </section>
+
+        <!-- Risk Analytics -->
+        <section id="risk-analytics-section" class="card">
+            <h2>Risk Analytics</h2>
+            <div class="analytics-grid">
+                <div class="analytics-card">
+                    <h3>Risk Factors</h3>
+                    <canvas id="riskFactors"></canvas>
+                </div>
+                <div class="analytics-card">
+                    <h3>Risk Trend</h3>
+                    <canvas id="riskTrend"></canvas>
+                </div>
+            </div>
         </section>
     </main>
     
@@ -77,17 +96,59 @@
                 .addTo(map)
                 .bindPopup(`${location.name}<br>Risk: ${location.risk}`);
         });
-    </script>
 
-    <script>
-        // Get all the links in the navbar
+        // Initialize Risk Factors Radar Chart
+        new Chart(document.getElementById('riskFactors').getContext('2d'), {
+            type: 'radar',
+            data: {
+                labels: ['Temperature', 'Wind', 'Humidity', 'Vegetation', 'Terrain'],
+                datasets: [{
+                    label: 'Current Risk Factors',
+                    data: [80, 65, 70, 85, 60],
+                    backgroundColor: 'rgba(255, 87, 34, 0.2)',
+                    borderColor: '#FF5722',
+                    pointBackgroundColor: '#FF5722'
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    r: {
+                        min: 0,
+                        max: 100,
+                        ticks: { display: false }
+                    }
+                }
+            }
+        });
+
+        // Initialize Risk Trend Line Chart
+        new Chart(document.getElementById('riskTrend').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: ['00:00', '06:00', '12:00', '18:00', '24:00'],
+                datasets: [{
+                    label: 'Risk Level',
+                    data: [30, 45, 75, 65, 45],
+                    borderColor: '#FF5722',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        });
+
+        // Highlight active navbar link
         const navLinks = document.querySelectorAll('.navbar a');
-
-        // Loop through each link
         navLinks.forEach(link => {
-            // Check if the current URL matches the link's href
             if (link.href === window.location.href) {
-                // Add the 'active' class to the matching link
                 link.classList.add('active');
             }
         });

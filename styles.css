@@ -1,3 +1,4 @@
+
 /* General styles */
 html, body {
     margin: 0;
@@ -285,7 +286,7 @@ body {
 /* Map Section */
 #map-section {
     width: 100%; /* Full width of the screen */
-    height: 400px; /* Adjust this value to set the height of the box */
+    height: 600px; /* Adjust this value to set the height of the box */
     padding:20px;
     box-sizing: border-box; /* Ensures padding doesn't affect total height */
 }
@@ -394,3 +395,146 @@ footer {
     color: white;
     text-align: center;
 }
+/* Drones Section */
+#drones-section {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+#drones-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.drone-card {
+    flex: 1 1 calc(33.333% - 20px);
+    background-color: #ffffff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.drone-card h3 {
+    margin: 0;
+    color: #333333;
+}
+
+.drone-card p {
+    margin: 5px 0;
+    color: #555555;
+    font-size: 14px;
+}
+/* Drones Section Styling */
+#drones-section {
+    margin: 30px 20px;
+    padding: 20px;
+    background-color: #2c2c2c; /* Dark background to match theme */
+    color: white;
+    border-radius: 10px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+#drones-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center; /* Center-align the cards */
+}
+
+.drone-card {
+    flex: 1 1 calc(33.333% - 20px);
+    background-color: #333;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #444;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.drone-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+}
+
+.drone-card h3 {
+    margin: 0;
+    color: #e25822; /* Fire-like accent for headings */
+}
+
+.drone-card p {
+    margin: 5px 0;
+    color: #ddd;
+    font-size: 1rem;
+}
+
+/* Signup Section Enhancements */
+#signup {
+    margin-top: 30px;
+    background-color: #1e1e1e; /* Darker background for emphasis */
+    color: white;
+    text-align: center;
+    padding: 40px 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+#signup h2 {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    color: #e25822; /* Fire color for emphasis */
+}
+
+#signup p {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    color: #ccc;
+}
+
+.signup-button {
+    background-color: #e25822;
+    color: white;
+    padding: 15px 30px;
+    text-decoration: none;
+    font-size: 1.2rem;
+    border-radius: 5px;
+    transition: background 0.3s ease, transform 0.3s ease;
+    display: inline-block;
+    margin-top: 20px;
+}
+
+.signup-button:hover {
+    background-color: #d14a14;
+    transform: scale(1.05);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .drone-card {
+        flex: 1 1 calc(50% - 20px); /* Adjust for smaller screens */
+    }
+
+    #signup h2 {
+        font-size: 2rem;
+    }
+
+    #signup p {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .drone-card {
+        flex: 1 1 100%; /* Full width for very small screens */
+    }
+
+    .signup-button {
+        font-size: 1rem;
+        padding: 10px 20px;
+    }
+}
+

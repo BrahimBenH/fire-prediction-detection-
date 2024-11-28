@@ -3,87 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detection</title>
+    <title>Fire Detection</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Add fallback CSS for hidden/visible */
+        .hidden { display: none; }
+        .visible { display: block; }
+        #map { height: 400px; }
+    </style>
 </head>
 <body>
+    <!-- Header Section -->
     <header class="header">
         <h1>Fire Detection</h1>
         <p>Visualize fire risks in real-time.</p>
     </header>
+
+    <!-- Navigation Menu -->
     <nav class="navbar">
         <ul>
             <li><a href="prediction.html">Prediction</a></li>
-            <li><a href="detection.html">Detection</a></li>
+            <li><a href="detection.html" class="active">Detection</a></li>
             <li><a href="report.html">Reports</a></li>
         </ul>
     </nav>
+
+    <!-- Main Content -->
     <main class="main-content">
+        <!-- Risk Map Section -->
         <section id="map-section" class="card">
             <h2>Risk Map</h2>
             <div id="map"></div>
+            <div class="map-controls">
+                <button id="show-drones" class="control-btn">Show Drone Paths</button>
+                <button id="toggle-heatmap" class="control-btn">Show Heat Map</button>
+            </div>
+        </section>
+
+        <!-- Drone Fleet Status -->
+        <section class="card" id="drone-status">
+            <h2>Drone Fleet Status</h2>
+            <div class="drone-grid">
+                <div class="drone-stats">
+                    <div class="stat-card">
+                        <h3>Active Drones</h3>
+                        <p class="stat-number">4</p>
+                        <canvas id="droneActivityChart"></canvas>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Battery Status</h3>
+                        <p class="stat-number">85%</p>
+                        <canvas id="batteryLevelsChart"></canvas>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Coverage Area</h3>
+                        <p class="stat-number">12.5 km²</p>
+                        <canvas id="coverageChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Detection Analytics -->
+        <section class="card" id="detection-analytics">
+            <h2>Detection Analytics</h2>
+            <div class="analytics-grid">
+                <div class="analytics-card">
+                    <h3>Temperature Readings</h3>
+                    <canvas id="temperatureChart"></canvas>
+                </div>
+                <div class="analytics-card">
+                    <h3>Smoke Detection</h3>
+                    <canvas id="smokeChart"></canvas>
+                </div>
+            </div>
         </section>
     </main>
-    
-    <footer class="footer">
-        <p>© 2024 Fire Prediction App. Powered by AI.</p>
-    </footer>
-    
-    <script>
-        // Initialize Leaflet map
-        var map = L.map('map').setView([34.0522, -118.2437], 6); // Example coordinates
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19
-        }).addTo(map);
 
-        // Example fire detection and drone locations
-        var locations = [
-            { lat: 34.0522, lng: -118.2437, status: "drone", name: "Los Angeles" }, // Drone heading
-            { lat: 36.7783, lng: -119.4179, status: "fire", name: "California" }, // Fire detected
-            { lat: 37.7749, lng: -122.4194, status: "no-fire", name: "San Francisco" } // No fire
+    <!-- Footer -->
+    <footer class="footer">
+        <p>© 2024 Fire Detection System. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Initialize Leaflet Map
+        const map = L.map('map').setView([34.0522, -118.2437], 6); // Example coordinates
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+
+        // Drone Data
+        const drones = [
+            { id: 'D1', status: 'active', battery: 85, location: [34.0522, -118.2437], altitude: 120 },
+            { id: 'D2', status: 'active', battery: 92, location: [34.0508, -118.2420], altitude: 150 },
+            { id: 'D3', status: 'charging', battery: 20, location: [34.0500, -118.2400], altitude: 0 },
+            { id: 'D4', status: 'active', battery: 78, location: [34.0530, -118.2450], altitude: 130 }
         ];
 
-        // Function to get the marker color based on the fire status
-        function getMarkerColor(status) {
-            switch (status) {
-                case "drone":
-                    return "blue";  // Drone heading location (Blue)
-                case "fire":
-                    return "red";   // Fire detected location (Red)
-                case "no-fire":
-                    return "green"; // No fire detected (Green)
-                default:
-                    return "gray";  // Default color if status is unknown
-            }
-        }
-
-        // Add markers for each location with color-based on status
-        locations.forEach(location => {
-            var markerColor = getMarkerColor(location.status);
-            L.circleMarker([location.lat, location.lng], {
-                color: markerColor,
-                radius: 10,
-                fillOpacity: 0.7
-            })
-            .addTo(map)
-            .bindPopup(`<strong>${location.name}</strong><br>Status: ${location.status === "drone" ? "Drone Heading" : location.status === "fire" ? "Fire Detected" : "No Fire Detected"}`)
-            .openPopup();
+        // Add Map Markers for Drones
+        const droneMarkers = drones.map(drone => {
+            return L.marker(drone.location).addTo(map)
+                .bindPopup(`<strong>Drone ${drone.id}</strong><br>Status: ${drone.status}<br>Battery: ${drone.battery}%`);
         });
-    </script>
 
-    <script>
-        // Get all the links in the navbar
-        const navLinks = document.querySelectorAll('.navbar a');
-
-        // Loop through each link
-        navLinks.forEach(link => {
-            // Check if the current URL matches the link's href
-            if (link.href === window.location.href) {
-                // Add the 'active' class to the matching link
-                link.classList.add('active');
+        // Toggle Drone Paths
+        let dronePaths = [];
+        document.getElementById("show-drones").addEventListener("click", function () {
+            if (dronePaths.length === 0) {
+                drones.forEach(drone => {
+                    if (drone.status === 'active') {
+                        const pathCoords = [
+                            drone.location,
+                            [drone.location[0] + 0.005, drone.location[1] + 0.005]
+                        ];
+                        const path = L.polyline(pathCoords, { color: '#4CAF50', weight: 2 }).addTo(map);
+                        dronePaths.push(path);
+                    }
+                });
+                this.innerText = "Hide Drone Paths";
+            } else {
+                dronePaths.forEach(path => map.removeLayer(path));
+                dronePaths = [];
+                this.innerText = "Show Drone Paths";
             }
+        });
+
+        // Toggle Heatmap
+        let heatmapLayer = null;
+        document.getElementById("toggle-heatmap").addEventListener("click", function () {
+            const heatData = drones.map(drone => [...drone.location, 0.5]);
+            if (!heatmapLayer) {
+                heatmapLayer = L.heatLayer(heatData, { radius: 25 }).addTo(map);
+                this.innerText = "Hide Heat Map";
+            } else {
+                map.removeLayer(heatmapLayer);
+                heatmapLayer = null;
+                this.innerText = "Show Heat Map";
+            }
+        });
+
+        // Initialize Charts
+        const initChart = (ctx, type, data) => new Chart(ctx, { type, data });
+
+        initChart(document.getElementById('droneActivityChart').getContext('2d'), 'doughnut', {
+            labels: ['Active', 'Charging', 'Maintenance'],
+            datasets: [{ data: [3, 1, 0], backgroundColor: ['#4CAF50', '#FFC107', '#F44336'] }]
+        });
+
+        initChart(document.getElementById('batteryLevelsChart').getContext('2d'), 'bar', {
+            labels: ['D1', 'D2', 'D3', 'D4'],
+            datasets: [{ data: [85, 92, 20, 78], backgroundColor: '#2196F3' }]
+        });
+
+        initChart(document.getElementById('temperatureChart').getContext('2d'), 'line', {
+            labels: ['1h', '2h', '3h', '4h', '5h'],
+            datasets: [{ data: [25, 27, 28, 26, 29], borderColor: '#FF5722' }]
+        });
+
+        initChart(document.getElementById('smokeChart').getContext('2d'), 'line', {
+            labels: ['1h', '2h', '3h', '4h', '5h'],
+            datasets: [{ data: [10, 15, 12, 18, 14], borderColor: '#607D8B' }]
         });
     </script>
 </body>

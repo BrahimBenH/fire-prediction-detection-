@@ -3,8 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reports</title>
+    <title>Propagation Report</title>
     <link rel="stylesheet" href="styles.css">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css">
+    <style>
+        .incident-details-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            background-color: #333; /* Dark background for contrast */
+            padding: 15px;
+            border-radius: 8px;
+            justify-content: center; /* Center align the items */
+        }
+        
+        .subbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1 1 calc(30% - 20px); /* Three subboxes per row with margin adjustments */
+            background-color: #555;
+            color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+            max-width: 200px; /* Ensure sub-boxes are compact */
+        }
+        
+        .subbox .icon {
+            width: 40px;
+            height: 40px;
+        }
+        
+        .subbox h4 {
+            margin: 0;
+            font-size: 1em;
+        }
+        
+        .subbox p {
+            margin: 2px 0;
+            font-size: 0.9em;
+            line-height: 1.2;
+        }
+        
+        #map-section {
+            margin-top: 20px;
+            background-color: #444;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        #map {
+            height: 300px;
+            width: 100%;
+            border: 2px solid #555;
+            border-radius: 8px;
+        }
+        
+    </style>
 </head>
 <body>
     <header class="header">
@@ -15,36 +72,145 @@
         <ul>
             <li><a href="prediction.html">Prediction</a></li>
             <li><a href="detection.html">Detection</a></li>
-            <li><a href="report.html">Reports</a></li>
+            <li><a href="report.html" class="active">Reports</a></li>
         </ul>
     </nav>
     <main class="main-content">
-        <section id="report-section" class="card">
-            <h2>Propagation Report</h2>
-            <div class="report-content">
-                <p>Region A: Fire spread predicted at 5 km/hr towards the north.</p>
-                <p>Region B: Stable with no propagation risks.</p>
+        <section class="card" id="current-incident">
+            <h2>Current Fire Incident</h2>
+            <!-- Flexbox containing fire details and estimated time -->
+            <div class="incident-details-container">
+                <div class="subbox">
+                    <img src="10494144.png" alt="Location Icon" class="icon">
+                    <div>
+                        <h4>Location</h4>
+                        <p>Chréa Forest, Tunisia</p>
+                        <p>36.5417° N, 8.6875° E</p>
+                    </div>
+                </div>
+                <div class="subbox">
+                    <img src="7458369.png" alt="Time Icon" class="icon">
+                    <div>
+                        <h4>Time</h4>
+                        <p>Started: 2024-01-15 14:30</p>
+                    </div>
+                </div>
+                <div class="subbox">
+                    <img src="fire-danger-symbol-logo-1D80E87801-seeklogo.com.png" alt="Status Icon" class="icon">
+                    <div>
+                        <h4>Status</h4>
+                        <p class="status active">Active</p>
+                    </div>
+                </div>
+                <div class="subbox">
+                    <img src="2439090.png" alt="Area Icon" class="icon">
+                    <div>
+                        <h4>Affected Area</h4>
+                        <p>Current: 2.5 km²</p>
+                        <p>Predicted: 4.8 km²</p>
+                    </div>
+                </div>
+                <div class="subbox">
+                    <img src="2117181.png" alt="Clock Icon" class="icon">
+                    <div>
+                        <h4>Estimated Time</h4>
+                        <p>45 minutes to predicted state</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Map in its own box -->
+        <section class="card" id="map-section">
+            <h2>Fire Map</h2>
+            <div id="map"></div>
+        </section>
+        
+        <!-- Response Resources -->
+        <section class="card" id="response-resources">
+            <h2>Response Resources</h2>
+            <div class="resources-grid">
+                <div class="resource-card">
+                    <h3>Deployed Units</h3>
+                    <canvas id="deployedUnits"></canvas>
+                </div>
+                <div class="resource-card">
+                    <h3>Response Timeline</h3>
+                    <canvas id="responseTimeline"></canvas>
+                </div>
             </div>
         </section>
     </main>
-    
     <footer class="footer">
-        <p>© 2024 Fire Prediction App. Powered by AI.</p>
+        <p>© 2024 Fire Report System. Powered by AI.</p>
     </footer>
-</body>
-<script>
-    // Get all the links in the navbar
-    const navLinks = document.querySelectorAll('.navbar a');
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Initialize the map centered on Chréa Forest (Tunisia)
+        const map = L.map('map').setView([36.5417, 8.6875], 13);
 
-    // Loop through each link
-    navLinks.forEach(link => {
-        // Check if the current URL matches the link's href
-        if (link.href === window.location.href) {
-            // Add the 'active' class to the matching link
-            link.classList.add('active');
+        // Add a tile layer (OpenStreetMap)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Draw the burned area
+        const burnedArea = L.polygon([
+            [36.540, 8.685],
+            [36.543, 8.690],
+            [36.546, 8.686],
+            [36.542, 8.682]
+        ], {
+            className: 'burned-area'
+        }).addTo(map).bindPopup("Burned Area");
+
+        // Draw the predicted area
+        const predictedArea = L.polygon([
+            [36.546, 8.686],
+            [36.550, 8.692],
+            [36.553, 8.688],
+            [36.548, 8.683]
+        ], {
+            className: 'predicted-area'
+        }).addTo(map).bindPopup("Predicted Area");
+
+        // Initialize Charts
+        function initializeCharts() {
+            new Chart(document.getElementById('deployedUnits').getContext('2d'), {
+                type: 'pie',
+                data: {
+                    labels: ['Firefighters', 'Vehicles', 'Aircraft', 'Drones'],
+                    datasets: [{
+                        data: [50, 20, 5, 15],
+                        backgroundColor: ['#1976D2', '#2196F3', '#64B5F6', '#90CAF9']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+
+            new Chart(document.getElementById('responseTimeline').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: ['0h', '2h', '4h', '6h', '8h'],
+                    datasets: [{
+                        label: 'Response Units',
+                        data: [10, 25, 45, 60, 90],
+                        borderColor: '#1976D2',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true
+                }
+            });
         }
-    });
-</script>
 
+        initializeCharts();
+    </script>
+</body>
 </html>
-
