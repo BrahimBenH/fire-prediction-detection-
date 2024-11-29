@@ -3,14 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prediction</title>
+    <title>Fire Prediction</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* General styles */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+        }
+
+        header {
+            text-align: center;
+            padding: 1rem;
+            background-color: #FF5722;
+            color: white;
+        }
+
+        .navbar {
+            background-color: #333;
+        }
+
+        .navbar ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .navbar li {
+            margin: 0 1rem;
+        }
+
+        .navbar a {
+            text-decoration: none;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+        }
+
+        .navbar a.active,
+        .navbar a:hover {
+            background-color: #FF5722;
+        }
+
+        .main-content {
+            padding: 1rem;
+        }
+
+        .collapsible {
+            background-color: #FF5722;
+            color: white;
+            cursor: pointer;
+            padding: 1rem;
+            width: 100%;
+            text-align: left;
+            border: none;
+            outline: none;
+            font-size: 1.25rem;
+        }
+
+        .collapsible:hover {
+            background-color: #e64a19;
+        }
+
+        .content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            padding: 0 1rem;
+            background-color: #fff;
+        }
+
+        .card {
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        #map {
+            height: 300px;
+            width: 100%;
+        }
+
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .analytics-card {
+            background-color: #fff;
+            padding: 1rem;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 1rem;
+            background-color: #333;
+            color: white;
+        }
+
+        /* Responsive styles */
+        @media (min-width: 768px) {
+            .analytics-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-    <header class="header">
+    <header>
         <h1>Fire Prediction</h1>
         <p>View predicted fire locations and their risk levels.</p>
     </header>
@@ -22,136 +131,127 @@
         </ul>
     </nav>
     <main class="main-content">
-        <!-- Predicted Fire Locations -->
-        <section id="predictions-section" class="card">
-            <h2>Predicted Fire Locations</h2>
-            <div id="cards-container" class="cards-container">
-                <!-- Cards will be generated here by JavaScript -->
+        <div class="card">
+            <button class="collapsible">Predicted Fire Locations</button>
+            <div class="content">
+                <div id="cards-container"></div>
             </div>
-        </section>
+        </div>
 
-        <!-- Risk Map -->
-        <section id="map-section" class="card">
-            <h2>Risk Map</h2>
-            <div id="map"></div>
-        </section>
+        <div class="card">
+            <button class="collapsible">Risk Map</button>
+            <div class="content">
+                <div id="map"></div>
+            </div>
+        </div>
 
-        <!-- Risk Analytics -->
-        <section id="risk-analytics-section" class="card">
-            <h2>Risk Analytics</h2>
-            <div class="analytics-grid">
-                <div class="analytics-card">
-                    <h3>Risk Factors</h3>
-                    <canvas id="riskFactors"></canvas>
-                </div>
-                <div class="analytics-card">
-                    <h3>Risk Trend</h3>
-                    <canvas id="riskTrend"></canvas>
+        <div class="card">
+            <button class="collapsible">Risk Analytics</button>
+            <div class="content">
+                <div class="analytics-grid">
+                    <div class="analytics-card">
+                        <h3>Risk Factors</h3>
+                        <canvas id="riskFactors"></canvas>
+                    </div>
+                    <div class="analytics-card">
+                        <h3>Risk Trend</h3>
+                        <canvas id="riskTrend"></canvas>
+                    </div>
                 </div>
             </div>
-        </section>
+        </div>
     </main>
-    
-    <footer class="footer">
+    <footer>
         <p>© 2024 Fire Prediction App. Powered by AI.</p>
     </footer>
-    
-    <script>
-        // Initialize Leaflet map
-        var map = L.map('map').setView([34.0522, -118.2437], 6); // Initial coordinates (Los Angeles)
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19
-        }).addTo(map);
 
-        // Example predicted locations with lat, lng, and risk level
-        var predictedLocations = [
+    <script>
+        // Toggle collapsible sections
+        const collapsibles = document.querySelectorAll('.collapsible');
+        collapsibles.forEach(button => {
+            button.addEventListener('click', function () {
+                this.classList.toggle('active');
+                const content = this.nextElementSibling;
+                if (content.style.maxHeight) {
+                    content.style.maxHeight = null;
+                } else {
+                    content.style.maxHeight = content.scrollHeight + "px";
+                    if (this.textContent === "Risk Analytics") {
+                        // Initialize charts when the section expands
+                        initializeCharts();
+                    }
+                }
+            });
+        });
+
+        // Initialize map
+        var map = L.map('map').setView([34.0522, -118.2437], 6);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+
+        // Populate prediction cards
+        const predictedLocations = [
             { lat: 34.0522, lng: -118.2437, name: "Los Angeles", risk: "High" },
             { lat: 36.7783, lng: -119.4179, name: "California", risk: "Moderate" },
             { lat: 37.7749, lng: -122.4194, name: "San Francisco", risk: "Low" }
         ];
-
-        // Generate cards dynamically for each predicted location
-        var cardsContainer = document.getElementById('cards-container');
-        predictedLocations.forEach(function(location) {
-            var card = document.createElement('div');
-            card.classList.add('prediction-card');
-            card.innerHTML = `
-                <h3>${location.name}</h3>
-                <p>Risk Level: ${location.risk}</p>
-            `;
-            // Add event listener to zoom the map when the card is clicked
-            card.addEventListener('click', function() {
-                map.setView([location.lat, location.lng], 10); // Zoom in on the clicked location
-                L.marker([location.lat, location.lng])
-                    .addTo(map)
-                    .bindPopup(`${location.name}<br>Risk: ${location.risk}`)
-                    .openPopup();
-            });
+        const cardsContainer = document.getElementById('cards-container');
+        predictedLocations.forEach(location => {
+            const card = document.createElement('div');
+            card.className = 'prediction-card';
+            card.innerHTML = `<h3>${location.name}</h3><p>Risk Level: ${location.risk}</p>`;
             cardsContainer.appendChild(card);
         });
 
-        // Create initial markers on the map for the predicted locations
-        predictedLocations.forEach(function(location) {
-            L.marker([location.lat, location.lng])
-                .addTo(map)
-                .bindPopup(`${location.name}<br>Risk: ${location.risk}`);
-        });
-
-        // Initialize Risk Factors Radar Chart
-        new Chart(document.getElementById('riskFactors').getContext('2d'), {
-            type: 'radar',
-            data: {
-                labels: ['Temperature', 'Wind', 'Humidity', 'Vegetation', 'Terrain'],
-                datasets: [{
-                    label: 'Current Risk Factors',
-                    data: [80, 65, 70, 85, 60],
-                    backgroundColor: 'rgba(255, 87, 34, 0.2)',
-                    borderColor: '#FF5722',
-                    pointBackgroundColor: '#FF5722'
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    r: {
-                        min: 0,
-                        max: 100,
-                        ticks: { display: false }
+        // Initialize charts
+        function initializeCharts() {
+            // Initialize Risk Factors Radar Chart
+            new Chart(document.getElementById('riskFactors').getContext('2d'), {
+                type: 'radar',
+                data: {
+                    labels: ['Temperature', 'Wind', 'Humidity', 'Vegetation', 'Terrain'],
+                    datasets: [{
+                        label: 'Current Risk Factors',
+                        data: [80, 65, 70, 85, 60],
+                        backgroundColor: 'rgba(255, 87, 34, 0.2)',
+                        borderColor: '#FF5722',
+                        pointBackgroundColor: '#FF5722'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: 100,
+                            ticks: { display: false }
+                        }
                     }
                 }
-            }
-        });
+            });
 
-        // Initialize Risk Trend Line Chart
-        new Chart(document.getElementById('riskTrend').getContext('2d'), {
-            type: 'line',
-            data: {
-                labels: ['00:00', '06:00', '12:00', '18:00', '24:00'],
-                datasets: [{
-                    label: 'Risk Level',
-                    data: [30, 45, 75, 65, 45],
-                    borderColor: '#FF5722',
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 100
+            // Initialize Risk Trend Line Chart
+            new Chart(document.getElementById('riskTrend').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: ['00:00', '06:00', '12:00', '18:00', '24:00'],
+                    datasets: [{
+                        label: 'Risk Level',
+                        data: [30, 45, 75, 65, 45],
+                        borderColor: '#FF5722',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
                     }
                 }
-            }
-        });
-
-        // Highlight active navbar link
-        const navLinks = document.querySelectorAll('.navbar a');
-        navLinks.forEach(link => {
-            if (link.href === window.location.href) {
-                link.classList.add('active');
-            }
-        });
+            });
+        }
     </script>
 </body>
 </html>

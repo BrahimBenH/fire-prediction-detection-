@@ -4,67 +4,150 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Propagation Report</title>
-    <link rel="stylesheet" href="styles.css">
-    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css">
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #222;
+            color: #fff;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px;
+            background-color: #444;
+        }
+
+        .navbar ul {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            background-color: #333;
+            margin: 0;
+        }
+
+        .navbar ul li {
+            margin: 0 10px;
+        }
+
+        .navbar ul li a {
+            text-decoration: none;
+            color: #fff;
+            padding: 10px 20px;
+            display: block;
+        }
+
+        .navbar ul li a.active, .navbar ul li a:hover {
+            background-color: #555;
+        }
+
+        .main-content {
+            padding: 20px;
+        }
+
+        .card {
+            margin-bottom: 20px;
+            background-color: #333;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
         .incident-details-container {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
-            background-color: #333; /* Dark background for contrast */
-            padding: 15px;
-            border-radius: 8px;
-            justify-content: center; /* Center align the items */
+            justify-content: center;
         }
-        
+
         .subbox {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex: 1 1 calc(30% - 20px); /* Three subboxes per row with margin adjustments */
+            flex: 1 1 calc(30% - 20px);
+            max-width: 200px;
             background-color: #555;
             color: #fff;
             padding: 10px;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-            max-width: 200px; /* Ensure sub-boxes are compact */
+            position: relative;
         }
-        
-        .subbox .icon {
-            width: 40px;
-            height: 40px;
-        }
-        
-        .subbox h4 {
-            margin: 0;
+
+        .subbox .toggle-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            text-align: left;
             font-size: 1em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            width: 100%;
         }
-        
-        .subbox p {
-            margin: 2px 0;
-            font-size: 0.9em;
-            line-height: 1.2;
+
+        .subbox .toggle-btn img {
+            width: 30px;
+            height: 30px;
         }
-        
+
+        .subbox .content {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .subbox.active .content {
+            display: block;
+        }
+
         #map-section {
             margin-top: 20px;
-            background-color: #444;
             padding: 15px;
+            background-color: #444;
             border-radius: 8px;
         }
-        
+
         #map {
             height: 300px;
             width: 100%;
+            border-radius: 8px;
             border: 2px solid #555;
+        }
+
+        .resources-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .resource-card {
+            flex: 1 1 calc(50% - 20px);
+            background-color: #555;
+            padding: 10px;
             border-radius: 8px;
         }
-        
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #333;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .subbox {
+                flex: 1 1 100%;
+                max-width: none;
+            }
+
+            .resources-grid {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body>
-    <header class="header">
+    <header>
         <h1>Propagation Report</h1>
         <p>Analyze fire spread and forecasts.</p>
     </header>
@@ -78,55 +161,55 @@
     <main class="main-content">
         <section class="card" id="current-incident">
             <h2>Current Fire Incident</h2>
-            <!-- Flexbox containing fire details and estimated time -->
             <div class="incident-details-container">
                 <div class="subbox">
-                    <img src="10494144.png" alt="Location Icon" class="icon">
-                    <div>
-                        <h4>Location</h4>
+                    <button class="toggle-btn">
+                        <img src="10494144.png" alt="Location Icon"> Location
+                    </button>
+                    <div class="content">
                         <p>Chréa Forest, Tunisia</p>
                         <p>36.5417° N, 8.6875° E</p>
                     </div>
                 </div>
                 <div class="subbox">
-                    <img src="7458369.png" alt="Time Icon" class="icon">
-                    <div>
-                        <h4>Time</h4>
+                    <button class="toggle-btn">
+                        <img src="7458369.png" alt="Time Icon"> Time
+                    </button>
+                    <div class="content">
                         <p>Started: 2024-01-15 14:30</p>
                     </div>
                 </div>
                 <div class="subbox">
-                    <img src="fire-danger-symbol-logo-1D80E87801-seeklogo.com.png" alt="Status Icon" class="icon">
-                    <div>
-                        <h4>Status</h4>
+                    <button class="toggle-btn">
+                        <img src="fire-danger-symbol-logo-1D80E87801-seeklogo.com.png" alt="Status Icon"> Status
+                    </button>
+                    <div class="content">
                         <p class="status active">Active</p>
                     </div>
                 </div>
                 <div class="subbox">
-                    <img src="2439090.png" alt="Area Icon" class="icon">
-                    <div>
-                        <h4>Affected Area</h4>
+                    <button class="toggle-btn">
+                        <img src="2439090.png" alt="Area Icon"> Affected Area
+                    </button>
+                    <div class="content">
                         <p>Current: 2.5 km²</p>
                         <p>Predicted: 4.8 km²</p>
                     </div>
                 </div>
                 <div class="subbox">
-                    <img src="2117181.png" alt="Clock Icon" class="icon">
-                    <div>
-                        <h4>Estimated Time</h4>
+                    <button class="toggle-btn">
+                        <img src="2117181.png" alt="Clock Icon"> Estimated Time
+                    </button>
+                    <div class="content">
                         <p>45 minutes to predicted state</p>
                     </div>
                 </div>
             </div>
         </section>
-        
-        <!-- Map in its own box -->
         <section class="card" id="map-section">
             <h2>Fire Map</h2>
             <div id="map"></div>
         </section>
-        
-        <!-- Response Resources -->
         <section class="card" id="response-resources">
             <h2>Response Resources</h2>
             <div class="resources-grid">
@@ -141,41 +224,25 @@
             </div>
         </section>
     </main>
-    <footer class="footer">
+    <footer>
         <p>© 2024 Fire Report System. Powered by AI.</p>
     </footer>
-    <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Initialize the map centered on Chréa Forest (Tunisia)
+        document.querySelectorAll('.toggle-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const subbox = button.parentElement;
+                subbox.classList.toggle('active');
+            });
+        });
+
         const map = L.map('map').setView([36.5417, 8.6875], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-        // Add a tile layer (OpenStreetMap)
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
-
-        // Draw the burned area
-        const burnedArea = L.polygon([
-            [36.540, 8.685],
-            [36.543, 8.690],
-            [36.546, 8.686],
-            [36.542, 8.682]
-        ], {
-            className: 'burned-area'
-        }).addTo(map).bindPopup("Burned Area");
-
-        // Draw the predicted area
-        const predictedArea = L.polygon([
-            [36.546, 8.686],
-            [36.550, 8.692],
-            [36.553, 8.688],
-            [36.548, 8.683]
-        ], {
-            className: 'predicted-area'
-        }).addTo(map).bindPopup("Predicted Area");
-
+        const burnedArea = L.polygon([[36.540, 8.685], [36.543, 8.690], [36.546, 8.686], [36.542, 8.682]], {color: 'red'}).addTo(map);
+        const predictedArea = L.polygon([[36.546, 8.686], [36.550, 8.692], [36.553, 8.688], [36.548, 8.683]], {color: 'orange'}).addTo(map);
+   
         // Initialize Charts
         function initializeCharts() {
             new Chart(document.getElementById('deployedUnits').getContext('2d'), {
